@@ -1,6 +1,12 @@
 const express = require('express')
 const cors = require('cors')
 
+const AdminRouter = require('./routes/admin/admin.router')
+const CustomerRouter = require('./routes/customer/customer.router')
+const DriverRouter = require('./routes/driver/driver.router')
+const StaffRouter = require('./routes/staff/staff.router')
+const AuthRouter = require('./routes/auth/auth.router')
+
 const app = express()
 
 app.use(cors({
@@ -12,6 +18,13 @@ app.use(cors({
 }))
 
 app.use(express.json())
+
+app.use('/admin', AdminRouter)
+app.use('/customer', CustomerRouter)
+app.use('/driver', DriverRouter)
+app.use('/staff', StaffRouter)
+app.use('/auth', AuthRouter)
+
 
 app.get('/', (req, res) => {
     res.json({message: "Sparrow: User Service"})
