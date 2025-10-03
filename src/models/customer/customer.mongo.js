@@ -23,11 +23,7 @@ const CustomerSchema = new mongoose.Schema({
     },
     createdTimestamp: {
         required: true,
-        type: String
-    },
-    lastLogin : {
         type: Date,
-        required: true,
         default: Date.now()
     }
 })
