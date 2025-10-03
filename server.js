@@ -1,46 +1,36 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const serverless = require("serverless-http");
-const http = require("http");
-const app = require("./src/app");
+const http = require('http')
+const app = require('./src/app')
+const mongoose = require('mongoose')
+const dotenv = require('dotenv')
 
-dotenv.config();
+dotenv.config()
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const PORT = process.env.PORT || 8002;
+const PORT = process.env.PORT || 8003
+const MONGODB_URI = process.env.MONGO_URL || 'mongodb://localhost:27017/sparrow-users'
 
-let isConnected = null;
+mongoose.connection.once('open', () => {
+    console.log("MongoDB is ready!")
+})
 
-// Reusable MongoDB connection (for serverless)
-async function connectToDatabase() {
-  if (isConnected) return;
-  try {
-    const db = await mongoose.connect(MONGODB_URI, { bufferCommands: false });
-    isConnected = db.connections[0].readyState;
-    console.log("✅ MongoDB connected");
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err);
-    throw err;
-  }
+mongoose.connection.on('error', (err) => {
+    console.error('Error in connecting with MongoDB:', err)
+})
+
+const server = http.createServer(app)
+
+async function createServer() {
+    try {
+        // CRITICAL: Connect to MongoDB before starting server
+        await mongoose.connect(MONGODB_URI)
+        console.log('MongoDB connected successfully!')
+        
+        server.listen(PORT, () => {
+            console.log(`Server listening on port ${PORT}..`)
+        })
+    } catch(err) {
+        console.error('Failed to connect to MongoDB:', err)
+        process.exit(1)
+    }
 }
 
-// Vercel handler (serverless)
-const handler = async (req, res) => {
-  await connectToDatabase();
-  return app(req, res);
-};
-
-// Local development (only runs if not in Vercel)
-if (!process.env.VERCEL) {
-  connectToDatabase().then(() => {
-    http.createServer(app).listen(PORT, () => {
-      console.log(`🚀 Server running locally on http://localhost:${PORT}`);
-    });
-  }).catch((err) => {
-    console.error("❌ Failed to start local server:", err);
-    process.exit(1);
-  });
-}
-
-// Export for Vercel
-module.exports = serverless(handler);
+createServer()
