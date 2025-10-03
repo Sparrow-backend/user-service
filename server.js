@@ -8,29 +8,25 @@ dotenv.config();
 const MONGODB_URI =
   process.env.MONGO_URL || "mongodb://localhost:27017/sparrow-users";
 
-// --- Cache connection (important for serverless) ---
-let isConnected = false;
+let isConnected;
 
-async function connectDB() {
+async function connectToDatabase() {
   if (isConnected) return;
   try {
     const db = await mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      bufferCommands: false,
     });
-    isConnected = db.connections[0].readyState === 1;
+    isConnected = db.connections[0].readyState;
     console.log("✅ MongoDB connected");
   } catch (err) {
-    console.error("❌ MongoDB connection error:", err.message);
+    console.error("❌ MongoDB connection error:", err);
     throw err;
   }
 }
 
-// --- Wrap app with serverless ---
-const handler = serverless(async (req, res) => {
-  await connectDB(); // ensure DB connected before each request
-  return app(req, res);
-});
+const handler = async (req, res) => {
+  await connectToDatabase();
+  return app(req, res); // Express will take over
+};
 
-// Export for Vercel
-module.exports = handler;
+module.exports = serverless(handler);
