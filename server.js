@@ -1,45 +1,36 @@
-const http = require("http");
-const app = require("./src/app");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const serverless = require("serverless-http"); // helps for AWS Lambda
+const serverless = require("serverless-http");
+const app = require("./src/app");
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8003;
 const MONGODB_URI =
   process.env.MONGO_URL || "mongodb://localhost:27017/sparrow-users";
 
-// Create HTTP server
-const server = http.createServer(app);
+// --- Cache connection (important for serverless) ---
+let isConnected = false;
 
-// MongoDB connection
-mongoose.connection.once("open", () => {
-  console.log("MongoDB is ready!");
-});
-
-mongoose.connection.on("error", (err) => {
-  console.error("Error in connecting with MongoDB:", err);
-});
-
-async function createServer() {
+async function connectDB() {
+  if (isConnected) return;
   try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("MongoDB connected successfully!");
-
-    // Only start listening if running directly (node server.js)
-    if (require.main === module) {
-      server.listen(PORT, () => {
-        console.log(`🚀 Server listening on port ${PORT}..`);
-      });
-    }
+    const db = await mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    isConnected = db.connections[0].readyState === 1;
+    console.log("✅ MongoDB connected");
   } catch (err) {
-    console.error("Failed to connect to MongoDB:", err);
-    process.exit(1);
+    console.error("❌ MongoDB connection error:", err.message);
+    throw err;
   }
 }
 
-createServer();
+// --- Wrap app with serverless ---
+const handler = serverless(async (req, res) => {
+  await connectDB(); // ensure DB connected before each request
+  return app(req, res);
+});
 
-// ✅ Export for serverless environments
-module.exports = app;            
+// Export for Vercel
+module.exports = handler;
