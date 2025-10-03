@@ -6,7 +6,7 @@ const {createAdmin} = require('../admin/admin.model')
 const {createCustomer} = require('../customer/customer.model')
 const {createDriver} = require('../driver/driver.model')
 const {createStaff} = require('../driver/driver.model')
-
+const bcrypt =  require('bcryptjs')
 
 const registerAdmin = async (data) => {
     const hashedPassword = await bcrypt.hash(data.password, 10);
