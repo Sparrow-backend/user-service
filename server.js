@@ -6,7 +6,7 @@ const app = require("./src/app");
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/sparrow-users";
+const MONGODB_URI = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 8002;
 
 let isConnected = null;
