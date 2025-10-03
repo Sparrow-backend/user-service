@@ -13,8 +13,9 @@ app.use(cors({
     origin: [
         'https://sparrow.nivakaran.dev',
         'http://localhost:3000',
-        'http://nivakaran.dev'
-    ]
+        'https://nivakaran.dev',
+    ],
+    credentials: true
 }))
 
 app.use(express.json())
