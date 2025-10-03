@@ -1,12 +1,9 @@
-const Admin = require('../admin/admin.mongo')
-const Customer = require('../customer/customer.mongo')
-const Staff = require('../staff/staff.mongo')
-const Driver = require('../driver/driver.mongo')
+const User = require('./user.mongo')
+const bcrypt = require('bcryptjs')
 const {createAdmin} = require('../admin/admin.model')
 const {createCustomer} = require('../customer/customer.model')
 const {createDriver} = require('../driver/driver.model')
-const {createStaff} = require('../driver/driver.model')
-const bcrypt =  require('bcryptjs')
+const {createStaff} = require('../staff/staff.model')
 
 const registerAdmin = async (data) => {
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -19,17 +16,16 @@ const registerAdmin = async (data) => {
         gender: data.gender
     })
 
-    const newUser = newUser({
+    const user = new User({
         userName: data.userName,
         password: hashedPassword,
         entityId: adminId,
         role: "Admin"
     })
 
-    await newUser.save();
+    await user.save();
     return "User created successfully"
 }
-
 
 const registerCustomer = async (data) => {
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -42,14 +38,14 @@ const registerCustomer = async (data) => {
         gender: data.gender
     })
 
-    const newUser = newUser({
+    const user = new User({
         userName: data.userName,
         password: hashedPassword,
         entityId: customerId,
         role: "Customer"
     })
 
-    await newUser.save();
+    await user.save();
     return "User created successfully"
 }
 
@@ -64,14 +60,14 @@ const registerStaff = async (data) => {
         gender: data.gender
     })
 
-    const newUser = newUser({
+    const user = new User({
         userName: data.userName,
         password: hashedPassword,
         entityId: staffId,
         role: "Staff"
     })
 
-    await newUser.save();
+    await user.save();
     return "User created successfully"
 }
 
@@ -86,14 +82,14 @@ const registerDriver = async (data) => {
         gender: data.gender
     })
 
-    const newUser = newUser({
+    const user = new User({
         userName: data.userName,
         password: hashedPassword,
         entityId: driverId,
         role: "Driver"
     })
 
-    await newUser.save();
+    await user.save();
     return "User created successfully"
 }
 

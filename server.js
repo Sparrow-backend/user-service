@@ -6,7 +6,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const PORT = process.env.PORT || 8003
-const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/sparrow-users'
+const MONGODB_URI = process.env.MONGO_URL || 'mongodb://localhost:27017/sparrow-users'
 
 mongoose.connection.once('open', () => {
     console.log("MongoDB is ready!")
@@ -21,7 +21,7 @@ const server = http.createServer(app)
 async function createServer() {
     try {
         // CRITICAL: Connect to MongoDB before starting server
-        await mongoose.connect(MONGO_URL)
+        await mongoose.connect(MONGODB_URI)
         console.log('MongoDB connected successfully!')
         
         server.listen(PORT, () => {
