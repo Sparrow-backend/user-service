@@ -6,31 +6,37 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const PORT = process.env.PORT || 8003
-const MONGODB_URI = process.env.MONGO_URL || 'mongodb://localhost:27017/sparrow-users'
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose.connection.once('open', () => {
     console.log("MongoDB is ready!")
 })
 
-mongoose.connection.on('error', (err) => {
-    console.error('Error in connecting with MongoDB:', err)
+mongoose.connection.on('error', () => {
+    console.error('Error in connecting with MongoDB')
 })
 
 const server = http.createServer(app)
 
 async function createServer() {
     try {
-        // CRITICAL: Connect to MongoDB before starting server
+
         await mongoose.connect(MONGODB_URI)
         console.log('MongoDB connected successfully!')
+        
         
         server.listen(PORT, () => {
             console.log(`Server listening on port ${PORT}..`)
         })
+
+        
     } catch(err) {
-        console.error('Failed to connect to MongoDB:', err)
+        console.error('Internal server error: ', err)
         process.exit(1)
     }
 }
 
 createServer()
+
+
