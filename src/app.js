@@ -6,6 +6,7 @@ const CustomerRouter = require('./routes/customer/customer.router')
 const DriverRouter = require('./routes/driver/driver.router')
 const StaffRouter = require('./routes/staff/staff.router')
 const AuthRouter = require('./routes/auth/auth.router')
+const UserRouter = require('./routes/user/user.router') // Add this line
 
 const app = express()
 
@@ -30,6 +31,7 @@ app.use('/customer', CustomerRouter)
 app.use('/driver', DriverRouter)
 app.use('/staff', StaffRouter)
 app.use('/auth', AuthRouter)
+app.use('/users', UserRouter) // Add this line
 
 
 app.get('/', (req, res) => {
